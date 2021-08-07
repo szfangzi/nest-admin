@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             Int            @id @default(autoincrement())
+  name           String         @unique
+  password       String
+  isSuper        Boolean        @default(false)
+  status         String         @default("active")
+  roles          Role[]
+  operationLogs  OperationLog[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+  deletedAt      DateTime?
+}
+
+model Role {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  users         User[]
+  permissions   Permission[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       @updatedAt
+  deletedAt     DateTime?
+}
+
+model Permission {
+  id            Int         @id @default(autoincrement())
+  type          String
+  roles         Role[]
+  element       PageElement?       @relation(fields: [elementId], references: [id])
+  elementId     Int?
+  menu          Menu?       @relation(fields: [menuId], references: [id])
+  menuId        Int?
+  operation     Operation?  @relation(fields: [operationId], references: [id])
+  operationId   Int?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime?   @updatedAt
+  deletedAt     DateTime?
+}
+
+model Menu {
+  id                Int         @id @default(autoincrement())
+  routeName         String      @unique
+  permission        Permission?
+  name              String
+  path              String
+  componentPath     String
+  redirect          String?
+  title             String?
+  icon              String?
+  hidden            Boolean?
+  parentId          Int?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime?   @updatedAt
+  deletedAt         DateTime?
+}
+
+model Operation {
+  id            Int             @id @default(autoincrement())
+  path          String?
+  method        String
+  name          String?
+  permission    Permission?
+  operationLogs OperationLog[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       @updatedAt
+  deletedAt     DateTime?
+}
+
+model PageElement {
+  id           Int         @id @default(autoincrement())
+  code         String      @unique
+  name         String
+  permission   Permission?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?   @updatedAt
+  deletedAt    DateTime?
+}
+
+model OperationLog {
+  id           Int         @id @default(autoincrement())
+  operation    Operation   @relation(fields: [operationId], references: [id])
+  operationId  Int
+  remark       String
+  file         File?       @relation(fields: [fileId], references: [id])
+  fileId       Int?
+  operator     User?       @relation(fields: [operatorId], references: [id])
+  operatorId   Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?   @updatedAt
+  deletedAt    DateTime?
+}
+
+model File {
+  id           Int         @id @default(autoincrement())
+  name         String      @unique
+  url          String
+  operationLog OperationLog?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime?   @updatedAt
+  deletedAt    DateTime?
+}
