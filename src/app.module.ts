@@ -1,19 +1,25 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule } from './modules/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from '@auth/auth.module';
 import { AdminModule } from '@admin/admin.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard, LocalGuard } from '@auth/guards/index';
 import { AuthService } from '@auth/services/auth.service';
-import { UserService } from '@access/user/user.service';
-import { PrismaService } from '@services/index';
+import { UserService } from '@admin/access/user/user.service';
+import { PrismaService } from '@modules/common/services/index';
+import { CommonModule } from '@modules/common/common.module';
+
+const ENV = process.env.NODE_ENV;
 
 @Global()
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: !ENV ? '.env' : `.env.${ENV}`,
+    }),
     AuthModule,
     AdminModule,
+    CommonModule,
   ],
   providers: [
     PrismaService,
@@ -28,6 +34,6 @@ import { PrismaService } from '@services/index';
     //   useClass: PermissionsGuard,
     // },
   ],
-  exports: [ConfigModule, PrismaService, AuthService],
+  exports: [ConfigModule, CommonModule],
 })
 export class AppModule {}

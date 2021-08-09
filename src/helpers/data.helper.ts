@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../services/prisma.service';
+import { PrismaService } from '../modules/common/services/prisma.service';
 import { Logger } from '@nestjs/common';
 
 export class DataHelper {

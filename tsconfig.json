@@ -16,10 +16,10 @@
       "@helpers/*":["src/helpers/*"],
       "@modules/*":["src/modules/*"],
       "@admin/*":["src/modules/admin/*"],
-      "@access/*":["src/modules/admin/access/*"],
       "@auth/*":["src/modules/auth/*"],
-      "@services/*":["src/services/*"],
+      "@common/*":["src/modules/common/*"],
       "@guards/*":["src/guards/*"],
+      "@dtos/*":["src/dtos/*"],
     },
     "incremental": true
   }

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AccessModule } from '@access/access.module';
+import { UserModule } from '@admin/access/user/user.module';
+import { PermissionModule } from '@admin/access/permission/permission.module';
+import { RoleModule } from '@admin/access/role/role.module';
 import { MenuModule } from './menu/menu.module';
 import { SettingModule } from './setting/setting.module';
 import { NotificationModule } from './notification/notification.module';
@@ -9,7 +11,9 @@ import { OperationLogModule } from './operation-log/operation-log.module';
 
 @Module({
   imports: [
-    AccessModule,
+    UserModule,
+    PermissionModule,
+    RoleModule,
     // OperationLogModule,
     // MenuModule,
     // SettingModule,

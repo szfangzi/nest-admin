@@ -2,13 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class AuthCredentialsRequestDto {
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: '账号不能为空！',
+  })
   @ApiProperty({
     example: 'admin',
   })
   readonly name: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message: '密码不能为空！',
+  })
   @ApiProperty({
     example: '888888',
   })

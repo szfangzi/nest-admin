@@ -2,22 +2,24 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { PrismaService } from '../../../../services/prisma.service';
+import { PrismaService } from '@modules/common/services/prisma.service';
 import {
   PaginationRequestDto,
-  PaginationDto,
   PaginationResponseDto,
-} from '../../../../dtos/pagination.dto';
+} from '@dtos/pagination.dto';
 import { User as UserModel } from '@prisma/client';
-import { PaginationHelper } from '../../../../helpers/pagination.helper';
-import { UserModelWithRelations, UserResponseDto } from '@access/user/dtos';
-import { UserMapper } from '@access/user/user.mapper';
+import { PaginationHelper } from '@helpers/pagination.helper';
+import {
+  UserModelWithRelations,
+  UserResponseDto,
+} from '@admin/access/user/dtos';
+import { UserMapper } from '@admin/access/user/user.mapper';
 import { DataNotFoundCanNotDeleteException } from '@exceptions/data-not-found-can-not-delete.exception';
 
 @Injectable()
 export class UserService implements OnModuleInit {
-  private prismaService: PrismaService;
-  constructor(private moduleRef: ModuleRef) {}
+  public prismaService: PrismaService;
+  constructor(public moduleRef: ModuleRef) {}
 
   onModuleInit() {
     this.prismaService = this.moduleRef.get(PrismaService);

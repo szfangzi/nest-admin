@@ -24,9 +24,9 @@ import {
 } from '../../../../dtos/pagination.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { LocalGuard } from '@auth/guards/local.guard';
-import { CreateUserDto } from '@access/user/dtos/create-user.dto';
-import { UpdateUserDto } from '@access/user/dtos/update-user.dto';
-import { UserResponseDto } from '@access/user/dtos';
+import { CreateUserDto } from '@admin/access/user/dtos/create-user.dto';
+import { UpdateUserDto } from '@admin/access/user/dtos/update-user.dto';
+import { UserResponseDto } from '@admin/access/user/dtos';
 // import { DataExistsException } from '../../exceptions';
 
 @Controller('users')

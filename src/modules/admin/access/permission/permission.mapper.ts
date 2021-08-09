@@ -4,9 +4,9 @@ import { MenuMapper } from '../../menu/menu.mapper';
 import { PermissionModelWithRelations } from './dtos/permission-model-with-relations.type';
 import { OperationMapper } from '../../operation/operation.mapper';
 import { PageElementMapper } from '../../pageElement/page-element.mapper';
-import { RoleResponseDto } from '@access/role/dtos';
+import { RoleResponseDto } from '@admin/access/role/dtos';
 import { MenuDto } from '@admin/menu/dtos/menu.dto';
-import { PermissionType } from '@access/permission/permission-type.enum';
+import { PermissionType } from '@admin/access/permission/permission-type.enum';
 import { RouteDto } from '@admin/menu/dtos/route.dto';
 import { PageElementResponseDto } from '@admin/pageElement/dtos/page-element-response.dto';
 

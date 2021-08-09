@@ -1,4 +1,4 @@
-import { UserResponseDto } from '@access/user/dtos';
+import { UserResponseDto } from '@admin/access/user/dtos';
 import { AccessResponseDto } from './access-response.dto';
 
 export class UserInfoDto {

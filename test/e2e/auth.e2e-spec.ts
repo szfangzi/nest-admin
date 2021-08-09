@@ -1,47 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { ConfigService } from '@nestjs/config';
-import { TimeLoggerInterceptor } from '../../src/interceptors/time-logger.interceptor';
-import { HttpExceptionsFilter } from '@exceptions/http-exceptions.filter';
-import { ErrorType } from '@exceptions/index';
-import { configSession } from '@config/index';
-
+import { ErrorType, HttpErrorType } from '@exceptions/index';
+import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const dotenv = require('dotenv');
+const env = process.env.NODE_ENV;
+dotenv.config({
+  path: path.resolve(process.cwd(), env ? '.env' : '.env.production'),
+});
+const baseUrl = process.env.API_BASE_URL;
+const port = process.env.API_PORT;
+const prefix = process.env.API_PREFIX;
+const agent = request(`${baseUrl}:${port}${prefix}`);
 describe('AuthController (e2e)', () => {
-  let app: INestApplication, prefix: string;
-
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    const configService = app.get(ConfigService);
-    prefix = configService.get<string>('API_PREFIX');
-
-    app.setGlobalPrefix(prefix);
-
-    // 全局API入参校验
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true, // 入参自动类型转换
-      }),
-    );
-
-    // 全局API result mapper
-    app.useGlobalInterceptors(new TimeLoggerInterceptor());
-
-    // 全局异常处理
-    app.useGlobalFilters(new HttpExceptionsFilter());
-    configSession(app);
-    await app.init();
-  });
-
   it('test login', async (done) => {
-    const agent = request(app.getHttpServer());
     const loginRes = await agent
-      .post(`${prefix}/auth/public/login`)
+      .post(`/auth/public/login`)
       .send({ name: 'admin', password: '888888' });
     expect(loginRes.statusCode).toBe(200);
     expect(loginRes.body.user).toBeDefined();
@@ -51,12 +26,51 @@ describe('AuthController (e2e)', () => {
   });
 
   it('test disabled user login', async (done) => {
-    const agent = request(app.getHttpServer());
     const loginRes = await agent
-      .post(`${prefix}/auth/public/login`)
+      .post(`/auth/public/login`)
       .send({ name: 'testDisabled', password: '888888' });
     expect(loginRes.statusCode).toBe(401);
     expect(loginRes.body.errorType).toBe(ErrorType.DisabledUser);
+    done();
+  });
+
+  it('test login with wrong password', async (done) => {
+    const loginRes = await agent
+      .post(`/auth/public/login`)
+      .send({ name: 'admin', password: '88888' });
+    expect(loginRes.statusCode).toBe(401);
+    expect(loginRes.body.errorType).toBe(ErrorType.InvalidPassword);
+    done();
+  });
+
+  it('test login with undefined name', async (done) => {
+    let loginRes = await agent
+      .post(`/auth/public/login`)
+      .send({ name: '', password: '888888' });
+    expect(loginRes.statusCode).toBe(400);
+    loginRes = await agent
+      .post(`/auth/public/login`)
+      .send({ name: 'admin', password: '' });
+    expect(loginRes.statusCode).toBe(400);
+    done();
+  });
+
+  it('get userInfo', async (done) => {
+    const loginRes = await agent
+      .post(`/auth/public/login`)
+      .send({ name: 'admin', password: '888888' });
+    expect(loginRes.statusCode).toBe(200);
+    const cookies = loginRes.get('Set-Cookie');
+    const userInfoRes = await agent
+      .get(`/auth/userInfo`)
+      .set('Cookie', cookies);
+    expect(userInfoRes.statusCode).toBe(200);
+    expect(userInfoRes.body.user).toBeDefined();
+    expect(userInfoRes.body.roles).toBeDefined();
+    expect(userInfoRes.body.access).toBeDefined();
+    expect(userInfoRes.body.access.routes).toBeDefined();
+    expect(userInfoRes.body.access.operations).toBeDefined();
+    expect(userInfoRes.body.access.pageElements).toBeDefined();
     done();
   });
 });

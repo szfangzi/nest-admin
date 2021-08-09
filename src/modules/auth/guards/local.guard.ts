@@ -13,9 +13,9 @@ import {
 } from '@exceptions/index';
 import { ModuleRef, Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { UserStatus } from '@access/user/user-status.enum';
+import { UserStatus } from '@admin/access/user/user-status.enum';
 import { User as UserModel } from '@prisma/client';
-import { UserService } from '@access/user/user.service';
+import { UserService } from '@admin/access/user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { GuardHelper } from '@auth/guards/guard.helper';
 import { NeedLoginException } from '@exceptions/need-login.exception';

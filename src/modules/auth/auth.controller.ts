@@ -5,9 +5,11 @@ import {
   HttpCode,
   Logger,
   Post,
-  Req, Session
-} from "@nestjs/common";
-import { Request } from 'express';
+  Req,
+  Session,
+  Res,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { AuthService } from './services/auth.service';
 import { AuthCredentialsRequestDto } from './dtos';
 import { Public } from './decorators/public.decorator';
@@ -35,7 +37,9 @@ export class AuthController {
 
   @Public()
   @Get('/public/logout')
-  async logout() {
-    this.authService.logout();
+  async logout(@Session() session, @Res() response: Response) {
+    session.destroy(null);
+    response.clearCookie('connect.sid');
+    return response.status(200).send();
   }
 }

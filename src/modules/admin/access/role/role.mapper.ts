@@ -14,15 +14,12 @@ import { RoleModelWithRelations } from './dtos/role-model-with-relations.type';
 export class RoleMapper {
   static toDto(role: RoleModel): RoleResponseDto {
     const dto = new RoleResponseDto();
-
     dto.id = role.id;
     dto.name = role.name;
     return dto;
   }
 
-  static toDtoWithRelations(
-    role: RoleModelWithRelations,
-  ): RoleResponseDto {
+  static toDtoWithRelations(role: RoleModelWithRelations): RoleResponseDto {
     const dto = new RoleResponseDto();
     dto.id = role.id;
     dto.name = role.name;
