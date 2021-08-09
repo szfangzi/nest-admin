@@ -37,7 +37,6 @@
     "dotenv": "^10.0.0",
     "express-session": "^1.17.2",
     "factory.ts": "^0.5.2",
-    "faker": "^5.5.3",
     "helmet": "^4.6.0",
     "node-match-path": "^0.6.3",
     "reflect-metadata": "0.1.13",
@@ -67,6 +66,7 @@
     "ts-loader": "9.2.4",
     "ts-node": "10.1.0",
     "tsconfig-paths": "3.10.1",
-    "typescript": "4.3.5"
+    "typescript": "4.3.5",
+    "faker": "^5.5.3"
   }
 }

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
-const hardDeleteModelList: string[] = [];
+// const hardDeleteModelList: string[] = [];
 
 @Injectable()
 export class PrismaService
@@ -29,28 +29,28 @@ export class PrismaService
     });
 
     // database soft delete middleware
-    this.$use(async (params, next) => {
-      // 非硬删的都默认软删
-      if (!hardDeleteModelList.includes(params.model)) {
-        const deletedAt = new Date();
-        if (params.action == 'delete') {
-          // Delete queries
-          // Change action to an update
-          params.action = 'update';
-          params.args['data'] = { deletedAt };
-        }
-        if (params.action == 'deleteMany') {
-          // Delete many queries
-          params.action = 'updateMany';
-          if (params.args.data != undefined) {
-            params.args.data['deletedAt'] = deletedAt;
-          } else {
-            params.args['data'] = { deletedAt };
-          }
-        }
-      }
-      return next(params);
-    });
+    // this.$use(async (params, next) => {
+    //   // 非硬删的都默认软删
+    //   if (!hardDeleteModelList.includes(params.model)) {
+    //     const deletedAt = new Date();
+    //     if (params.action == 'delete') {
+    //       // Delete queries
+    //       // Change action to an update
+    //       params.action = 'update';
+    //       params.args['data'] = { deletedAt };
+    //     }
+    //     if (params.action == 'deleteMany') {
+    //       // Delete many queries
+    //       params.action = 'updateMany';
+    //       if (params.args.data != undefined) {
+    //         params.args.data['deletedAt'] = deletedAt;
+    //       } else {
+    //         params.args['data'] = { deletedAt };
+    //       }
+    //     }
+    //   }
+    //   return next(params);
+    // });
   }
 
   async onModuleDestroy() {

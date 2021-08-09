@@ -1,6 +1,6 @@
 import { HttpExceptionsFilter } from './http-exceptions.filter';
 import { DataExistsException } from './data-exists.exception';
-import { DataNotFoundCanNotDeleteException } from './data-not-found-can-not-delete.exception';
+import { DataNotFoundCanNotDeletedException } from './data-not-found-can-not-deleted.exception';
 import { DisabledUserException } from './disabled-user.exception';
 import { InvalidAccountException } from './invalid-account.exception';
 import { LoginExpiredException } from './login-expired.exception';
@@ -9,7 +9,8 @@ export enum ErrorType {
   NeedLogin = 'NEED_LOGIN',
   LoginExpired = 'LOGIN_EXPIRED',
   DataExists = 'DATA_EXISTS',
-  DataNotFoundCannotBeDeleted = 'DATA_NOT_FOUND_CAN_NOT_DELETE',
+  DataNotFoundCannotBeDeleted = 'DATA_NOT_FOUND_CAN_NOT_DELETED',
+  DataNotFoundCannotBeUpdated = 'DATA_NOT_FOUND_CAN_NOT_UPDATED',
   InvalidPassword = 'INVALID_PASSWORD',
   InvalidAccount = 'INVALID_ACCOUNT',
   DisabledUser = 'DISABLED_USER',
@@ -51,7 +52,7 @@ export {
   HttpExceptionsFilter,
   DataExistsException,
   DisabledUserException,
-  DataNotFoundCanNotDeleteException,
+  DataNotFoundCanNotDeletedException,
   InvalidAccountException,
   LoginExpiredException,
 };

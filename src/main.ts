@@ -7,6 +7,7 @@ import { HttpExceptionsFilter } from './exceptions/';
 import { configSession } from '@config/session.config';
 import { DataHelper } from '@helpers/data.helper';
 import { TimeLoggerInterceptor } from './interceptors/time-logger.interceptor';
+import * as helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +29,9 @@ async function bootstrap() {
 
   // 全局异常处理
   app.useGlobalFilters(new HttpExceptionsFilter());
+
+  app.use(helmet());
+  app.enableCors();
 
   configSwagger(app);
   configSession(app);

@@ -3,20 +3,22 @@ let testRegex = '.*\\.spec\\.ts$';
 if (type === 'E2E') {
   testRegex = '.e2e-spec.ts$';
 }
+
+// jest测试覆盖率branch(条件分支)数据有bug
 module.exports = {
   collectCoverageFrom: [
     '**/user.service.(t|j)s',
     '!**/prisma.service.ts',
-    // '!**/*.filter.ts',
-    // '!**/*.guard.ts',
-    // '!**/*.decorator.ts',
-    // '!**/*.interceptor.ts',
-    // '!**/*.exception.ts',
-    // '!**/*.controller.ts',
-    // '!**/*.index.ts',
-    // '!**/*.module.ts',
-    // '!**/*.config.ts',
-    // '!**/*.dto.ts',
+    '!**/*.filter.ts',
+    '!**/*.guard.ts',
+    '!**/*.decorator.ts',
+    '!**/*.interceptor.ts',
+    '!**/*.exception.ts',
+    '!**/*.controller.ts',
+    '!**/*.index.ts',
+    '!**/*.module.ts',
+    '!**/*.config.ts',
+    '!**/*.dto.ts',
   ],
   coverageDirectory: './coverage',
   coveragePathIgnorePatterns: [
