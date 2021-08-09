@@ -5,8 +5,7 @@ import { CreateUserDto } from '@admin/access/user/dtos/create-user.dto';
 import { UpdateUserDto } from '@admin/access/user/dtos/update-user.dto';
 import { HashHelper } from '@helpers/hash.helper';
 import { UserStatus } from '@admin/access/user/user-status.enum';
-import { DataNotFoundCanNotUpdatedException } from "@exceptions/data-not-found-can-not-updated.exception";
-import { ErrorType, HttpErrorType } from "@exceptions/index";
+import { ErrorType } from '@exceptions/index';
 
 describe('UserService', () => {
   let service: UserService;
