@@ -1,9 +1,8 @@
-// import { PermissionMapper } from '../permissions/permission.mapper';
-// import { RoleMapper } from '../roles/role.mapper';
 import { UserModelWithRelations, UserResponseDto } from './dtos';
 import { UserStatus } from './user-status.enum';
 import { User as UserModel } from '@prisma/client';
 import { RoleMapper } from '../role/role.mapper';
+import { UserModelWithRoles } from '@admin/access/user/dtos/user-model-with-relations.type';
 
 export class UserMapper {
   static toDto(user: UserModel): UserResponseDto {
@@ -16,51 +15,15 @@ export class UserMapper {
     return dto;
   }
 
-  static toDtoWithRoles(user: UserModelWithRelations): UserResponseDto {
-    const dto = new UserResponseDto();
-    dto.id = user.id;
-    dto.name = user.name;
-    dto.isSuper = user.isSuper;
+  static toDtoWithRoles(user: UserModelWithRoles): UserResponseDto {
+    const dto = UserMapper.toDto(user);
     if (user.roles) dto.roles = user.roles.map(RoleMapper.toDto);
-    dto.status = user.status as UserStatus;
     return dto;
   }
 
-  static toDtoWithRelations(
-    user: UserModelWithRelations,
-  ): UserResponseDto {
-    const dto = new UserResponseDto();
-    dto.id = user.id;
-    dto.name = user.name;
-    dto.isSuper = user.isSuper;
+  static toDtoWithRelations(user: UserModelWithRelations): UserResponseDto {
+    const dto = UserMapper.toDto(user);
     if (user.roles) dto.roles = user.roles.map(RoleMapper.toDtoWithRelations);
-    dto.status = user.status as UserStatus;
     return dto;
   }
-  //
-  // static toCreateEntity(dtos: CreateUserRequestDto): UserEntity {
-  //   const entity = new UserEntity();
-  //   entity.username = dtos.username;
-  //   entity.firstName = dtos.firstName;
-  //   entity.lastName = dtos.lastName;
-  //   entity.password = dtos.password;
-  //   entity.permissions = Promise.resolve(dtos.permissions.map(id => new PermissionEntity({ id })));
-  //   entity.roles = Promise.resolve(dtos.roles.map(id => new RoleEntity({ id })));
-  //   entity.status = UserStatus.Active;
-  //   entity.isSuperUser = false;
-  //   return entity;
-  // }
-  //
-  // static toUpdateEntity(
-  //   entity: UserEntity,
-  //   dtos: UpdateUserRequestDto
-  // ): UserEntity {
-  //   entity.username = dtos.username;
-  //   entity.firstName = dtos.firstName;
-  //   entity.lastName = dtos.lastName;
-  //   entity.permissions = Promise.resolve(dtos.permissions.map(id => new PermissionEntity({ id })));
-  //   entity.roles = Promise.resolve(dtos.roles.map(id => new RoleEntity({ id })));
-  //   entity.status = dtos.status;
-  //   return entity;
-  // }
 }

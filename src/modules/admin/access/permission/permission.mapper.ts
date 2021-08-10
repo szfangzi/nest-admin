@@ -70,30 +70,4 @@ export class PermissionMapper {
       pageElements,
     };
   }
-  //
-  // static toCreateEntity(dtos: CreateUserRequestDto): UserEntity {
-  //   const entity = new UserEntity();
-  //   entity.username = dtos.username;
-  //   entity.firstName = dtos.firstName;
-  //   entity.lastName = dtos.lastName;
-  //   entity.password = dtos.password;
-  //   entity.permissions = Promise.resolve(dtos.permissions.map(id => new PermissionEntity({ id })));
-  //   entity.roles = Promise.resolve(dtos.roles.map(id => new RoleEntity({ id })));
-  //   entity.status = UserStatus.Active;
-  //   entity.isSuperUser = false;
-  //   return entity;
-  // }
-  //
-  // static toUpdateEntity(
-  //   entity: UserEntity,
-  //   dtos: UpdateUserRequestDto
-  // ): UserEntity {
-  //   entity.username = dtos.username;
-  //   entity.firstName = dtos.firstName;
-  //   entity.lastName = dtos.lastName;
-  //   entity.permissions = Promise.resolve(dtos.permissions.map(id => new PermissionEntity({ id })));
-  //   entity.roles = Promise.resolve(dtos.roles.map(id => new RoleEntity({ id })));
-  //   entity.status = dtos.status;
-  //   return entity;
-  // }
 }

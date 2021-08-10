@@ -10,24 +10,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-// import { CreateUserDto } from './dtos/create-user.dtos';
-// import { UpdateUserDto } from './dtos/update-user.dtos';
-// import {
-//   ActionResponseDto,
-//   RESPONSE_CODE,
-// } from '../../../../dtos/response.dtos';
 import { User as UserModel } from '@prisma/client';
 import {
   PaginationRequestDto,
-  PaginationDto,
   PaginationResponseDto,
-} from '../../../../dtos/pagination.dto';
+} from '@dtos/pagination.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { LocalGuard } from '@auth/guards/local.guard';
+import { CreateUserRequestDto } from '@admin/access/user/dtos/create-user-request.dto';
+import { UpdateUserRequestDto } from '@admin/access/user/dtos/update-user-request.dto';
+import { UserResponseDto } from '@admin/access/user/dtos';
 import { CreateUserDto } from '@admin/access/user/dtos/create-user.dto';
 import { UpdateUserDto } from '@admin/access/user/dtos/update-user.dto';
-import { UserResponseDto } from '@admin/access/user/dtos';
-// import { DataExistsException } from '../../exceptions';
 
 @Controller('users')
 export class UserController {
@@ -41,7 +35,10 @@ export class UserController {
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(
+    @Body() createUserRequestDto: CreateUserRequestDto,
+  ): Promise<UserResponseDto> {
+    const createUserDto = new CreateUserDto();
     return this.userService.create(createUserDto);
   }
 
@@ -56,7 +53,11 @@ export class UserController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id') id: number,
+    @Body() updateUserRequestDto: UpdateUserRequestDto,
+  ) {
+    const updateUserDto = new UpdateUserDto();
     return await this.userService.update(id, updateUserDto);
   }
 

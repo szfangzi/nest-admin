@@ -1,4 +1,16 @@
-import { Menu as MenuModel, User as UserModel, Operation as OperationModel, PageElement as PageElementModel } from '@prisma/client';
+import {
+  Menu as MenuModel,
+  User as UserModel,
+  Operation as OperationModel,
+  PageElement as PageElementModel,
+} from '@prisma/client';
+
+export type UserModelWithRoles = UserModel & {
+  roles: Array<{
+    id: number;
+    name: string;
+  }>;
+};
 
 export type UserModelWithRelations = UserModel & {
   roles: Array<{

@@ -4,7 +4,7 @@ import { AuthModule } from '@auth/auth.module';
 import { AdminModule } from '@admin/admin.module';
 import { APP_GUARD } from '@nestjs/core';
 import { PermissionsGuard, LocalGuard } from '@auth/guards/index';
-import { AuthService } from '@auth/services/auth.service';
+import { AuthService } from '@auth/auth.service';
 import { UserService } from '@admin/access/user/user.service';
 import { PrismaService } from '@modules/common/services/index';
 import { CommonModule } from '@modules/common/common.module';

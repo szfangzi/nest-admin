@@ -1,4 +1,3 @@
-import { UserStatus } from '../user-status.enum';
 import { RoleResponseDto } from '../../role/dtos';
 
 export class UserResponseDto {
@@ -6,5 +5,12 @@ export class UserResponseDto {
   name: string;
   roles?: RoleResponseDto[];
   isSuper: boolean;
-  status: UserStatus;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
+}
+
+export class UserWithAllFieldsResponseDto extends UserResponseDto {
+  password: string;
 }

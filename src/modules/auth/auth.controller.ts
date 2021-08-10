@@ -10,7 +10,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './auth.service';
 import { AuthCredentialsRequestDto } from './dtos';
 import { Public } from './decorators/public.decorator';
 import { UserInfoDto } from '@auth/dtos/user-info.dto';

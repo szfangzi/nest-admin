@@ -5,7 +5,7 @@ import {
   OnModuleInit,
   Session,
 } from '@nestjs/common';
-import { AuthCredentialsRequestDto } from '../dtos';
+import { AuthCredentialsRequestDto } from './dtos';
 import { ContextId, ContextIdFactory, ModuleRef, REQUEST } from '@nestjs/core';
 import {
   DisabledUserException,
@@ -25,14 +25,9 @@ import { UserInfoDto } from '@auth/dtos/user-info.dto';
 import { AuthHelper } from '@auth/auth.helper';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService {
   @Inject(REQUEST) request;
-  private contextId: ContextId;
   constructor(private moduleRef: ModuleRef) {}
-
-  async onModuleInit() {
-    this.contextId = ContextIdFactory.create();
-  }
 
   async login({
     name,

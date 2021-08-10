@@ -1,4 +1,4 @@
-import { PaginationRequestDto, PaginationDto } from '../dtos/pagination.dto';
+import { PaginationRequestDto, PaginationDto } from '@dtos/pagination.dto';
 
 export class PaginationHelper {
   static query(

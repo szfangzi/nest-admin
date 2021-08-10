@@ -5,7 +5,7 @@ import {
   CanActivate,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthService } from '@auth/services/auth.service';
+import { AuthService } from '@auth/auth.service';
 import {
   DisabledUserException,
   ErrorType,

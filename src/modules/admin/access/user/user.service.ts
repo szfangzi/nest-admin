@@ -1,24 +1,24 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ContextIdFactory, ModuleRef } from '@nestjs/core';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
-import { PrismaService } from '@modules/common/services/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import {
   PaginationRequestDto,
   PaginationResponseDto,
 } from '@dtos/pagination.dto';
 import { User as UserModel } from '@prisma/client';
-import { PaginationHelper } from '@helpers/pagination.helper';
+import { PaginationHelper, HashHelper, prisma } from '@helpers/index';
 import {
   UserModelWithRelations,
   UserResponseDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserWithAllFieldsResponseDto,
+  FindUserDto,
 } from '@admin/access/user/dtos';
 import { UserMapper } from '@admin/access/user/user.mapper';
-import { DataNotFoundCanNotUpdatedException } from '@exceptions/data-not-found-can-not-updated.exception';
-import { HashHelper } from '@helpers/hash.helper';
-import { DataNotFoundCanNotDeletedException } from '@exceptions/data-not-found-can-not-deleted.exception';
-import { FindUserWhereInterface } from '@admin/access/user/dtos/find-user-where.interface';
-import prisma from '@helpers/prisma.helper';
+import {
+  DataNotFoundCanNotUpdatedException,
+  DataNotFoundCanNotDeletedException,
+} from '@exceptions/index';
 
 @Injectable()
 export class UserService {
@@ -26,11 +26,11 @@ export class UserService {
 
   async pagination(
     paginationRequestDto: PaginationRequestDto,
-    findUserWhere?: FindUserWhereInterface,
+    findUserDto?: FindUserDto,
   ): Promise<PaginationResponseDto<UserResponseDto[]>> {
     const countParams = {
       where: {
-        ...findUserWhere,
+        ...findUserDto,
         deletedAt: null,
       },
     };
@@ -44,7 +44,7 @@ export class UserService {
     });
     const modelResults = await prisma.user.findMany(whereParams);
     const results = modelResults.map((userModel) => {
-      return UserMapper.toDtoWithRelations(userModel);
+      return UserMapper.toDtoWithRoles(userModel);
     });
     return {
       current,
@@ -56,28 +56,21 @@ export class UserService {
     };
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     createUserDto.password = await HashHelper.encrypt(createUserDto.password);
-    return await prisma.user.create({
+    const user = await prisma.user.create({
       data: createUserDto,
+      include: {
+        roles: true,
+      },
     });
+    return UserMapper.toDtoWithRoles(user);
   }
 
-  // async findAll(): Promise<UserModel[]> {
-  //   return await prisma.user.findMany({
-  //     where: {
-  //       deletedAt: null,
-  //     },
-  //     include: {
-  //       roles: true,
-  //     },
-  //   });
-  // }
-
-  async findAll(findUserWhere?: FindUserWhereInterface): Promise<UserModel[]> {
+  async findAll(findUserDto?: FindUserDto): Promise<UserModel[]> {
     return await prisma.user.findMany({
       where: {
-        ...findUserWhere,
+        ...findUserDto,
         deletedAt: null,
       },
       include: {
@@ -86,15 +79,28 @@ export class UserService {
     });
   }
 
-  async findOne(id: number) {
-    return prisma.user.findUnique({ where: { id } });
+  async findOne(id: number): Promise<UserResponseDto> {
+    return prisma.user.findUnique({
+      where: { id },
+      include: {
+        roles: true,
+      },
+    });
   }
 
-  async findOneByName(name: string) {
-    return prisma.user.findFirst({ where: { name } });
+  async findOneByName(name: string): Promise<UserWithAllFieldsResponseDto> {
+    return prisma.user.findFirst({
+      where: { name },
+      include: {
+        roles: true,
+      },
+    });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
     const user: UserModel = await prisma.user.findUnique({
       where: { id },
     });
@@ -104,6 +110,9 @@ export class UserService {
     return await prisma.user.update({
       where: { id },
       data: updateUserDto,
+      include: {
+        roles: true,
+      },
     });
   }
 
@@ -116,7 +125,7 @@ export class UserService {
     });
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<UserResponseDto> {
     const user: UserModel = await prisma.user.findUnique({
       where: { id },
     });
@@ -124,6 +133,9 @@ export class UserService {
     return await prisma.user.update({
       where: {
         id,
+      },
+      include: {
+        roles: true,
       },
       data: {
         deletedAt: new Date(),
