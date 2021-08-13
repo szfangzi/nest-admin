@@ -1,23 +1,9 @@
-import {
-  Inject,
-  Injectable,
-  Logger,
-  OnModuleInit,
-  Session,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { AuthCredentialsRequestDto } from './dtos';
-import { ContextId, ContextIdFactory, ModuleRef, REQUEST } from '@nestjs/core';
-import {
-  DisabledUserException,
-  ErrorType,
-  InvalidAccountException,
-  LoginExpiredException,
-} from '@exceptions/index';
-import { HashHelper } from '@helpers/hash.helper';
-import { InvalidPasswordException } from '@exceptions/invalid-password.exception';
-import { UserStatus } from '@admin/access/user/user-status.enum';
+import { ModuleRef, REQUEST } from '@nestjs/core';
+import { InvalidAccountException } from '@exceptions/index';
 import { UserMapper } from '@admin/access/user/user.mapper';
-import { UserModelWithRelations } from '@admin/access/user/dtos';
+import { UserDto, UserModelWithRelations } from '@admin/access/user/dtos';
 import { UserService } from '@admin/access/user/user.service';
 import { PermissionMapper } from '@admin/access/permission/permission.mapper';
 import { User as UserModel } from '@prisma/client';
@@ -58,14 +44,15 @@ export class AuthService {
     // user maybe have disabled status
     AuthHelper.validateUserStatus(user);
 
-    // user model map to response dto
-    const userDto = UserMapper.toDto(user);
+    // user model map to response dtos
+    // const userDto = UserMapper.toDto(user);
+    const userDto = new UserDto(user);
     const { roles = [] } = UserMapper.toDtoWithRelations(user);
     const { routes, operations, pageElements } =
       PermissionMapper.toAccessResponseDto(roles);
     const mappedRoles = roles.map(({ id, name }) => ({ id, name }));
 
-    const userInfo: UserInfoDto = {
+    const userInfo: UserInfoDto = new UserInfoDto({
       user: userDto,
       access: {
         routes,
@@ -73,10 +60,8 @@ export class AuthService {
         pageElements,
       },
       roles: mappedRoles,
-    };
-
+    });
     this.request.session.userInfo = userInfo;
-
     return userInfo;
   }
 }

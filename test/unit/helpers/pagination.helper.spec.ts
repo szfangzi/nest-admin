@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaginationHelper } from '@helpers/pagination.helper';
-import { PaginationRequestDto } from '../../../src/dtos/pagination.dto';
+import { PaginationRequestDto } from '../../../src/dtos/pagination.dtos';
 
 describe('PaginationHelper', () => {
   it('query', () => {

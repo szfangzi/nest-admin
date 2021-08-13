@@ -1,27 +1,25 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  ClassSerializerInterceptor,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
-  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User as UserModel } from '@prisma/client';
 import {
   PaginationRequestDto,
   PaginationResponseDto,
-} from '@dtos/pagination.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { LocalGuard } from '@auth/guards/local.guard';
-import { CreateUserRequestDto } from '@admin/access/user/dtos/create-user-request.dto';
-import { UpdateUserRequestDto } from '@admin/access/user/dtos/update-user-request.dto';
-import { UserResponseDto } from '@admin/access/user/dtos';
-import { CreateUserDto } from '@admin/access/user/dtos/create-user.dto';
-import { UpdateUserDto } from '@admin/access/user/dtos/update-user.dto';
+} from '@helpers/pagination.helper';
+import {
+  CreateUserRequestDto,
+  UpdateUserRequestDto,
+  UserDto,
+} from '@admin/access/user/dtos';
 
 @Controller('users')
 export class UserController {
@@ -30,26 +28,24 @@ export class UserController {
   @Get()
   async pagination(
     @Query() paginationRequestDto: PaginationRequestDto,
-  ): Promise<PaginationResponseDto<UserResponseDto[]>> {
+  ): Promise<PaginationResponseDto<UserDto[]>> {
     return await this.userService.pagination(paginationRequestDto);
   }
 
   @Post()
-  create(
-    @Body() createUserRequestDto: CreateUserRequestDto,
-  ): Promise<UserResponseDto> {
-    const createUserDto = new CreateUserDto();
-    return this.userService.create(createUserDto);
+  create(@Body() createUserRequestDto: CreateUserRequestDto): Promise<UserDto> {
+    return this.userService.create(createUserRequestDto);
   }
 
   @Get('query/all')
-  async findAll(): Promise<UserModel[]> {
+  async findAll(): Promise<UserDto[]> {
     return await this.userService.findAll();
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.userService.findOne(id);
+    return new UserDto(await this.userService.findOne(id));
   }
 
   @Patch(':id')
@@ -57,8 +53,7 @@ export class UserController {
     @Param('id') id: number,
     @Body() updateUserRequestDto: UpdateUserRequestDto,
   ) {
-    const updateUserDto = new UpdateUserDto();
-    return await this.userService.update(id, updateUserDto);
+    return await this.userService.update(id, updateUserRequestDto);
   }
 
   @Delete(':id')

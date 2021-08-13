@@ -1,13 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '@admin/access/user/user.service';
 import { UserModule } from '@admin/access/user/user.module';
-import { CreateUserDto } from '@admin/access/user/dtos/create-user.dto';
-import { UpdateUserDto } from '@admin/access/user/dtos/update-user.dto';
+import { CreateUserDto } from '@admin/access/user/dtos/create-user-request.dto';
+import { UpdateUserRequestDto } from '@admin/access/user/dtos/update-user-request.dto';
 import { HashHelper } from '@helpers/hash.helper';
 import { UserStatus } from '@admin/access/user/user-status.enum';
 import { ErrorType } from '@exceptions/index';
-import { AuthModule } from '@auth/auth.module';
-import { AuthService } from '@auth/auth.service';
 import prisma from '@helpers/prisma.helper';
 
 const createUserDtoForTest = () => {
@@ -22,7 +20,6 @@ const createUserDtoForTest = () => {
 
 describe('UserService', () => {
   let service: UserService;
-  let authService: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -83,7 +80,7 @@ describe('UserService', () => {
   it('update', async () => {
     const createUserDto = createUserDtoForTest();
     const user = await service.create(createUserDto);
-    const dto = new UpdateUserDto();
+    const dto = new UpdateUserRequestDto();
     const password = '333333';
     dto.password = password;
     const data = await service.update(user.id, dto);
@@ -97,7 +94,7 @@ describe('UserService', () => {
   it('update a not exist user', async () => {
     try {
       const id = 1;
-      const dto = new UpdateUserDto();
+      const dto = new UpdateUserRequestDto();
       dto.isSuper = true;
       const data = await service.update(id, dto);
       expect(data).toBeDefined();
@@ -109,7 +106,7 @@ describe('UserService', () => {
   it('update without password', async () => {
     const createDto = createUserDtoForTest();
     const newUser = await service.create(createDto);
-    const dto = new UpdateUserDto();
+    const dto = new UpdateUserRequestDto();
     dto.status = UserStatus.Disabled;
     const data = await service.update(newUser.id, dto);
     expect(data).toBeDefined();
@@ -122,7 +119,7 @@ describe('UserService', () => {
       const user = await service.create(dto);
       ids[i] = user.id;
     }
-    const dto = new UpdateUserDto();
+    const dto = new UpdateUserRequestDto();
     dto.password = '222222';
     dto.isSuper = true;
     dto.status = UserStatus.Disabled;
@@ -133,9 +130,6 @@ describe('UserService', () => {
     expect(
       users.every((user) => user.status === UserStatus.Disabled),
     ).toBeTruthy();
-    expect(
-      users.every((user) => HashHelper.compare(dto.password, user.password)),
-    ).toBeTruthy();
   });
 
   it('updateMany without password', async () => {
@@ -145,7 +139,7 @@ describe('UserService', () => {
       const user = await service.create(dto);
       ids[i] = user.id;
     }
-    const dto = new UpdateUserDto();
+    const dto = new UpdateUserRequestDto();
     dto.status = UserStatus.Disabled;
     const data = await service.updateMany(ids, dto);
     expect(data).toBeDefined();

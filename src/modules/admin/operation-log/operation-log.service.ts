@@ -1,26 +1,81 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOperationLogDto } from './dto/create-operation-log.dto';
-import { UpdateOperationLogDto } from './dto/update-operation-log.dto';
+import { CreateOperationLogDto } from '@admin/operation-log/dto';
+import {
+  PaginationHelper,
+  PaginationRequestDto,
+  PaginationResponseDto,
+} from '@helpers/pagination.helper';
+import {
+  FindOperationLogDto,
+  OperationLogResponseDto,
+} from '@admin/operation-log/dto';
+import { prisma } from '@helpers/index';
+import { OperationLogMapper } from '@admin/operation-log/operation-log.mapper';
 
 @Injectable()
 export class OperationLogService {
-  create(createOperationLogDto: CreateOperationLogDto) {
-    return 'This action adds a new operationLog';
+  async pagination(
+    paginationRequestDto: PaginationRequestDto,
+    findOperationLogDto?: FindOperationLogDto,
+  ): Promise<PaginationResponseDto<OperationLogResponseDto[]>> {
+    const countParams = {
+      where: {
+        ...findOperationLogDto,
+        deletedAt: null,
+      },
+    };
+    const totalRecords = await prisma.operationLog.count(countParams);
+    const { skip, take, current, pageSize, totalPages, hasNext } =
+      PaginationHelper.query(paginationRequestDto, totalRecords);
+    const whereParams = Object.assign({ skip, take }, countParams);
+    const modelResults = await prisma.operationLog.findMany(whereParams);
+    const results = modelResults.map((operatorLogModel) => {
+      return OperationLogMapper.toDto(operatorLogModel);
+    });
+    return {
+      current,
+      pageSize,
+      totalPages,
+      totalRecords,
+      hasNext,
+      results,
+    };
   }
 
-  findAll() {
-    return `This action returns all operationLog`;
+  async create(
+    createOperationLogDto: CreateOperationLogDto,
+  ): Promise<OperationLogResponseDto> {
+    return prisma.operationLog.create({
+      data: createOperationLogDto,
+      include: {
+        operation: true,
+        operator: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} operationLog`;
+  async findAll(
+    findOperationLogDto?: FindOperationLogDto,
+  ): Promise<OperationLogResponseDto[]> {
+    return prisma.operationLog.findMany({
+      where: {
+        ...findOperationLogDto,
+        deletedAt: null,
+      },
+      include: {
+        operation: true,
+        operator: true,
+      },
+    });
   }
 
-  update(id: number, updateOperationLogDto: UpdateOperationLogDto) {
-    return `This action updates a #${id} operationLog`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} operationLog`;
+  async findOne(id: number): Promise<OperationLogResponseDto> {
+    return prisma.operationLog.findUnique({
+      where: { id },
+      include: {
+        operation: true,
+        operator: true,
+      },
+    });
   }
 }

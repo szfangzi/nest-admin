@@ -3,21 +3,21 @@ import { ModuleRef } from '@nestjs/core';
 import {
   PaginationRequestDto,
   PaginationResponseDto,
-} from '@dtos/pagination.dto';
+} from '@helpers/pagination.helper';
 import { User as UserModel } from '@prisma/client';
-import { PaginationHelper, HashHelper, prisma } from '@helpers/index';
+import { HashHelper, PaginationHelper, prisma } from '@helpers/index';
 import {
+  CreateUserRequestDto,
+  FindUserRequestDto,
+  UpdateUserRequestDto,
+  UserDto,
   UserModelWithRelations,
-  UserResponseDto,
-  CreateUserDto,
-  UpdateUserDto,
-  UserWithAllFieldsResponseDto,
-  FindUserDto,
 } from '@admin/access/user/dtos';
 import { UserMapper } from '@admin/access/user/user.mapper';
 import {
-  DataNotFoundCanNotUpdatedException,
+  DataExistsException,
   DataNotFoundCanNotDeletedException,
+  DataNotFoundCanNotUpdatedException,
 } from '@exceptions/index';
 
 @Injectable()
@@ -26,8 +26,8 @@ export class UserService {
 
   async pagination(
     paginationRequestDto: PaginationRequestDto,
-    findUserDto?: FindUserDto,
-  ): Promise<PaginationResponseDto<UserResponseDto[]>> {
+    findUserDto?: FindUserRequestDto,
+  ): Promise<PaginationResponseDto<UserDto[]>> {
     const countParams = {
       where: {
         ...findUserDto,
@@ -56,19 +56,30 @@ export class UserService {
     };
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    createUserDto.password = await HashHelper.encrypt(createUserDto.password);
-    const user = await prisma.user.create({
-      data: createUserDto,
+  async create(createUserRequestDto: CreateUserRequestDto): Promise<UserDto> {
+    const existUser = await this.findOneByName(createUserRequestDto.name);
+    if (existUser) throw new DataExistsException();
+    createUserRequestDto.password = await HashHelper.encrypt(
+      createUserRequestDto.password,
+    );
+    const roleIds = createUserRequestDto.roles.map((role) => ({
+      id: role,
+    }));
+    return prisma.user.create({
+      data: {
+        ...createUserRequestDto,
+        roles: {
+          connect: roleIds,
+        },
+      },
       include: {
         roles: true,
       },
     });
-    return UserMapper.toDtoWithRoles(user);
   }
 
-  async findAll(findUserDto?: FindUserDto): Promise<UserModel[]> {
-    return await prisma.user.findMany({
+  async findAll(findUserDto?: FindUserRequestDto): Promise<UserDto[]> {
+    return prisma.user.findMany({
       where: {
         ...findUserDto,
         deletedAt: null,
@@ -79,8 +90,8 @@ export class UserService {
     });
   }
 
-  async findOne(id: number): Promise<UserResponseDto> {
-    return prisma.user.findUnique({
+  async findOne(id: number): Promise<UserDto> {
+    return await prisma.user.findUnique({
       where: { id },
       include: {
         roles: true,
@@ -88,7 +99,7 @@ export class UserService {
     });
   }
 
-  async findOneByName(name: string): Promise<UserWithAllFieldsResponseDto> {
+  async findOneByName(name: string): Promise<UserModel> {
     return prisma.user.findFirst({
       where: { name },
       include: {
@@ -99,38 +110,50 @@ export class UserService {
 
   async update(
     id: number,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserResponseDto> {
+    updateUserRequestDto: UpdateUserRequestDto,
+  ): Promise<UserDto> {
     const user: UserModel = await prisma.user.findUnique({
       where: { id },
     });
     if (!user) throw new DataNotFoundCanNotUpdatedException();
-    if (updateUserDto.password)
-      updateUserDto.password = await HashHelper.encrypt(updateUserDto.password);
-    return await prisma.user.update({
+    if (updateUserRequestDto.password)
+      updateUserRequestDto.password = await HashHelper.encrypt(
+        updateUserRequestDto.password,
+      );
+    const roleIds = updateUserRequestDto.roles.map((role) => ({
+      id: role,
+    }));
+    return prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data: {
+        ...updateUserRequestDto,
+        roles: {
+          set: roleIds,
+        },
+      },
       include: {
         roles: true,
       },
     });
   }
 
-  async updateMany(ids: number[], updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password)
-      updateUserDto.password = await HashHelper.encrypt(updateUserDto.password);
-    return await prisma.user.updateMany({
+  async updateMany(ids: number[], updateUserRequestDto: UpdateUserRequestDto) {
+    if (updateUserRequestDto.password)
+      updateUserRequestDto.password = await HashHelper.encrypt(
+        updateUserRequestDto.password,
+      );
+    return prisma.user.updateMany({
       where: { id: { in: ids } },
-      data: updateUserDto,
+      data: updateUserRequestDto,
     });
   }
 
-  async remove(id: number): Promise<UserResponseDto> {
+  async remove(id: number): Promise<UserDto> {
     const user: UserModel = await prisma.user.findUnique({
       where: { id },
     });
     if (!user) throw new DataNotFoundCanNotDeletedException();
-    return await prisma.user.update({
+    return prisma.user.update({
       where: {
         id,
       },

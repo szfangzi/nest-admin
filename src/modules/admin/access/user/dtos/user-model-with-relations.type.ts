@@ -5,13 +5,6 @@ import {
   PageElement as PageElementModel,
 } from '@prisma/client';
 
-export type UserModelWithRoles = UserModel & {
-  roles: Array<{
-    id: number;
-    name: string;
-  }>;
-};
-
 export type UserModelWithRelations = UserModel & {
   roles: Array<{
     id: number;

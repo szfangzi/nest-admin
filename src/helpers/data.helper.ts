@@ -32,7 +32,7 @@ export class DataHelper {
           method: item.method.toUpperCase(),
         };
       });
-
+    console.log(availableRoutes, 'availableRoutes');
     availableRoutes.forEach(async (route) => {
       const operation = await prismaService.operation.findFirst({
         where: route,

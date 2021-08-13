@@ -1,15 +1,13 @@
 import { Menu as MenuModel } from '@prisma/client';
-import { MenuDto } from './dtos/menu.dto';
 import { RouteDto } from './dtos/route.dto';
-import { Logger } from '@nestjs/common';
+import { MenuResponseDto } from '@admin/menu/dtos';
 
 export class MenuMapper {
-  static toDto(menu: MenuModel): MenuDto {
-    const dto = new MenuDto();
+  static toDto(menu: MenuModel): MenuResponseDto {
+    const dto = new MenuResponseDto();
     dto.id = menu.id;
     dto.routeName = menu.routeName;
     dto.componentPath = menu.componentPath;
-    dto.name = menu.name;
     dto.path = menu.path;
     dto.redirect = menu.redirect;
     dto.title = menu.title;
@@ -19,11 +17,17 @@ export class MenuMapper {
     return dto;
   }
 
-  static toRouteDto(menuDto: MenuDto): RouteDto {
+  // static toDtoWithPermission(menu: MenuModelWithRelations): MenuResponseDto {
+  //   const dtos = MenuMapper.toDto(menu);
+  //   dtos.permission = PermissionMapper.toDto(menu.permission);
+  //   return dtos;
+  // }
+
+  static toRouteDto(menuDto: MenuResponseDto): RouteDto {
     const routeDto = new RouteDto();
     routeDto.routeName = menuDto.routeName;
+    routeDto.path = menuDto.path;
     routeDto.componentPath = menuDto.componentPath;
-    routeDto.name = menuDto.name;
     if (menuDto.redirect) routeDto.redirect = menuDto.redirect;
     routeDto.hidden = menuDto.hidden;
     routeDto.meta = {};
@@ -34,7 +38,7 @@ export class MenuMapper {
     return routeDto;
   }
 
-  static toRoutes(menus: MenuDto[]): RouteDto[] {
+  static toRoutes(menus: MenuResponseDto[]): RouteDto[] {
     for (let i = 0; i < menus.length; i++) {
       const menu = menus[i];
       if (menu.parentId) {

@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpCode,
-  Logger,
   Post,
   Req,
   Session,
@@ -32,7 +31,7 @@ export class AuthController {
   @Get('/userInfo')
   @HttpCode(200)
   async getUserInfo(@Session() session): Promise<UserInfoDto> {
-    return this.authService.getUserInfo(session.userInfo.user.id);
+    return await this.authService.getUserInfo(session.userInfo.user.id);
   }
 
   @Public()

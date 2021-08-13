@@ -8,6 +8,10 @@ if (type === 'E2E') {
 module.exports = {
   collectCoverageFrom: [
     '**/user.service.(t|j)s',
+    '**/menu.service.(t|j)s',
+    '**/operation.service.(t|j)s',
+    '**/operation-log.service.(t|j)s',
+    '**/page-element.service.(t|j)s',
     '!**/prisma.service.ts',
     '!**/*.filter.ts',
     '!**/*.guard.ts',
@@ -18,7 +22,7 @@ module.exports = {
     '!**/*.index.ts',
     '!**/*.module.ts',
     '!**/*.config.ts',
-    '!**/*.dto.ts',
+    '!**/*.dtos.ts',
   ],
   coverageDirectory: './coverage',
   coveragePathIgnorePatterns: [

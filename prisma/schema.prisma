@@ -31,17 +31,17 @@ model Role {
 }
 
 model Permission {
-  id            Int         @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   type          String
   roles         Role[]
-  element       PageElement?       @relation(fields: [elementId], references: [id])
+  element       PageElement?    @relation(fields: [elementId], references: [id])
   elementId     Int?
-  menu          Menu?       @relation(fields: [menuId], references: [id])
+  menu          Menu?           @relation(fields: [menuId], references: [id])
   menuId        Int?
-  operation     Operation?  @relation(fields: [operationId], references: [id])
+  operation     Operation?      @relation(fields: [operationId], references: [id])
   operationId   Int?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime?   @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       @updatedAt
   deletedAt     DateTime?
 }
 
@@ -49,9 +49,8 @@ model Menu {
   id                Int         @id @default(autoincrement())
   routeName         String      @unique
   permission        Permission?
-  name              String
-  path              String
-  componentPath     String
+  path              String      @unique
+  componentPath     String?
   redirect          String?
   title             String?
   icon              String?
@@ -88,10 +87,13 @@ model OperationLog {
   id           Int         @id @default(autoincrement())
   operation    Operation   @relation(fields: [operationId], references: [id])
   operationId  Int
+  businessName String?
+  businessType String?
+  businessId   Int?
   remark       String
   file         File?       @relation(fields: [fileId], references: [id])
   fileId       Int?
-  operator     User?       @relation(fields: [operatorId], references: [id])
+  operator     User       @relation(fields: [operatorId], references: [id])
   operatorId   Int
   createdAt    DateTime    @default(now())
   updatedAt    DateTime?   @updatedAt
@@ -99,11 +101,22 @@ model OperationLog {
 }
 
 model File {
-  id           Int         @id @default(autoincrement())
-  name         String      @unique
-  url          String
+  id           Int              @id @default(autoincrement())
+  name         String
+  path         String?
+  mimetype     String?
   operationLog OperationLog?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime?   @updatedAt
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime?        @updatedAt
   deletedAt    DateTime?
+}
+
+model Shulou {
+  id            Int               @id @default(autoincrement())
+  ajQz          Boolean
+  ajZxdy        Boolean
+  ajDy          Boolean
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime?         @updatedAt
+  deletedAt     DateTime?
 }

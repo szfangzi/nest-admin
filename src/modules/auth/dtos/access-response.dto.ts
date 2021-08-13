@@ -1,5 +1,5 @@
 import { RouteDto } from '@admin/menu/dtos/route.dto';
-import { PageElementResponseDto } from '@admin/pageElement/dtos/page-element-response.dto';
+import { PageElementResponseDto } from '@admin/page-element/dtos/page-element-response.dto';
 import { OperationResponseDto } from '@admin/operation/dtos/operation.response.dto';
 
 export class AccessResponseDto {

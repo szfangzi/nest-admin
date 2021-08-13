@@ -1,12 +1,10 @@
 import { Operation as OperationModel } from '@prisma/client';
-import { OperationDto } from './dtos/operation.dto';
-import { PermissionDto } from '../access/permission/dtos';
-import { PageElementResponseDto } from '../pageElement/dtos/page-element-response.dto';
 import { OperationResponseDto } from './dtos/operation.response.dto';
+import { PermissionResponseDto } from '@admin/access/permission/dtos/permission-response.dto';
 
 export class OperationMapper {
-  static toDto(operation: OperationModel): OperationDto {
-    const dto = new OperationDto();
+  static toDto(operation: OperationModel): OperationResponseDto {
+    const dto = new OperationResponseDto();
 
     dto.id = operation.id;
     dto.name = operation.name;
@@ -16,14 +14,14 @@ export class OperationMapper {
   }
 
   static permissionDtoToResponseDto(
-    permissionDto: PermissionDto,
+    permissionResponseDto: PermissionResponseDto,
   ): OperationResponseDto {
     const responseDto = new OperationResponseDto();
-    responseDto.id = permissionDto.operation.id;
-    responseDto.path = permissionDto.operation.path;
-    responseDto.method = permissionDto.operation.method;
-    responseDto.name = permissionDto.operation.name;
-    responseDto.permissionId = permissionDto.id;
+    responseDto.id = permissionResponseDto.operation.id;
+    responseDto.path = permissionResponseDto.operation.path;
+    responseDto.method = permissionResponseDto.operation.method;
+    responseDto.name = permissionResponseDto.operation.name;
+    responseDto.permissionId = permissionResponseDto.id;
     return responseDto;
   }
 }

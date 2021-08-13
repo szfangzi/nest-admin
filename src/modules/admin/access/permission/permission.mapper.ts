@@ -1,18 +1,18 @@
-import { PermissionDto } from './dtos/index';
 import { Permission as PermissionModel } from '@prisma/client';
 import { MenuMapper } from '../../menu/menu.mapper';
 import { PermissionModelWithRelations } from './dtos/permission-model-with-relations.type';
 import { OperationMapper } from '../../operation/operation.mapper';
-import { PageElementMapper } from '../../pageElement/page-element.mapper';
+import { PageElementMapper } from '../../page-element/page-element.mapper';
 import { RoleResponseDto } from '@admin/access/role/dtos';
-import { MenuDto } from '@admin/menu/dtos/menu.dto';
+import { MenuResponseDto } from '@admin/menu/dtos/menu-response.dto';
 import { PermissionType } from '@admin/access/permission/permission-type.enum';
 import { RouteDto } from '@admin/menu/dtos/route.dto';
-import { PageElementResponseDto } from '@admin/pageElement/dtos/page-element-response.dto';
+import { PageElementResponseDto } from '@admin/page-element/dtos/page-element-response.dto';
+import { PermissionResponseDto } from '@admin/access/permission/dtos';
 
 export class PermissionMapper {
-  static toDto(permission: PermissionModel): PermissionDto {
-    const dto = new PermissionDto();
+  static toDto(permission: PermissionModel): PermissionResponseDto {
+    const dto = new PermissionResponseDto();
 
     dto.id = permission.id;
     dto.type = permission.type;
@@ -21,8 +21,8 @@ export class PermissionMapper {
 
   static toDtoWithRelations(
     permission: PermissionModelWithRelations,
-  ): PermissionDto {
-    const dto = new PermissionDto();
+  ): PermissionResponseDto {
+    const dto = new PermissionResponseDto();
     dto.id = permission.id;
     dto.type = permission.type;
     if (permission.menu) dto.menu = MenuMapper.toDto(permission.menu);
@@ -35,7 +35,7 @@ export class PermissionMapper {
 
   static toAccessResponseDto(roles: RoleResponseDto[]) {
     const permissions = roles.reduce(
-      (permissions: PermissionDto[], roleDto: RoleResponseDto) => {
+      (permissions: PermissionResponseDto[], roleDto: RoleResponseDto) => {
         if (roleDto.permissions)
           roleDto.permissions.forEach((rolePermission) => {
             if (
@@ -50,7 +50,7 @@ export class PermissionMapper {
       },
       [],
     );
-    const menus: MenuDto[] = permissions
+    const menus: MenuResponseDto[] = permissions
       .filter((permission) => permission.type === PermissionType.Menu)
       .map((permission) => Object.assign({}, permission.menu));
     const routes: RouteDto[] = MenuMapper.toRoutes(menus);

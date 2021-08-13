@@ -1,26 +1,119 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMenuDto } from './dtos/create-menu.dto';
-import { UpdateMenuDto } from './dtos/update-menu.dto';
+import { CreateMenuDto, UpdateMenuDto } from '@admin/menu/dtos';
+import { PaginationHelper, prisma } from '@helpers/index';
+import { MenuMapper } from '@admin/menu/menu.mapper';
+import { MenuResponseDto } from '@admin/menu/dtos';
+import {
+  PaginationRequestDto,
+  PaginationResponseDto,
+} from '@helpers/pagination.helper';
+import { FindMenuDto } from '@admin/menu/dtos/find-menu.dto';
+import { DataNotFoundException } from '@exceptions/data-not-found.exception';
 
 @Injectable()
 export class MenuService {
-  create(createMenuDto: CreateMenuDto) {
-    return 'This action adds a new menu';
+  async pagination(
+    paginationRequestDto: PaginationRequestDto,
+    findMenuDto?: FindMenuDto,
+  ): Promise<PaginationResponseDto<MenuResponseDto[]>> {
+    const countParams = {
+      where: {
+        ...findMenuDto,
+        deletedAt: null,
+      },
+    };
+    const totalRecords = await prisma.menu.count(countParams);
+    const { skip, take, current, pageSize, totalPages, hasNext } =
+      PaginationHelper.query(paginationRequestDto, totalRecords);
+    const whereParams = Object.assign({ skip, take }, countParams);
+    const modelResults = await prisma.menu.findMany(whereParams);
+    const results = modelResults.map((menuModel) => {
+      return MenuMapper.toDto(menuModel);
+    });
+    return {
+      current,
+      pageSize,
+      totalPages,
+      totalRecords,
+      hasNext,
+      results,
+    };
   }
 
-  findAll() {
-    return `This action returns all menu`;
+  async create(createMenuDto: CreateMenuDto): Promise<MenuResponseDto> {
+    return prisma.menu.create({
+      data: createMenuDto,
+      include: {
+        permission: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} menu`;
+  async findAll(findMenuDto?: FindMenuDto): Promise<MenuResponseDto[]> {
+    return prisma.menu.findMany({
+      where: {
+        ...findMenuDto,
+        deletedAt: null,
+      },
+      include: {
+        permission: true,
+      },
+    });
   }
 
-  update(id: number, updateMenuDto: UpdateMenuDto) {
-    return `This action updates a #${id} menu`;
+  async findOne(id: number): Promise<MenuResponseDto> {
+    return prisma.menu.findUnique({
+      where: { id },
+      include: {
+        permission: true,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} menu`;
+  async update(
+    id: number,
+    updateMenuDto: UpdateMenuDto,
+  ): Promise<MenuResponseDto> {
+    const menu = await prisma.menu.findUnique({
+      where: { id },
+    });
+    if (!menu) throw new DataNotFoundException();
+    return prisma.menu.update({
+      where: { id },
+      data: updateMenuDto,
+    });
+  }
+
+  async updateMany(ids: number[], updateMenuDto: UpdateMenuDto) {
+    return prisma.menu.updateMany({
+      where: { id: { in: ids } },
+      data: updateMenuDto,
+    });
+  }
+
+  async remove(id: number): Promise<MenuResponseDto> {
+    const menu = await prisma.user.findUnique({
+      where: { id },
+    });
+    if (!menu) throw new DataNotFoundException();
+    return prisma.menu.update({
+      where: {
+        id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  }
+
+  async removeMany(ids: number[]) {
+    return await prisma.menu.updateMany({
+      where: {
+        id: { in: ids },
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
   }
 }
